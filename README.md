@@ -8,7 +8,16 @@ http://34.139.156.199:8111/retrieve_athlete_info/Weikeng
 ```
 - Example Response:
 ```json
-{'name': 'Weikeng Liang', 'gender': 'male', 'date_of_birth': datetime.date(2000, 11, 30), 'match_name': "badminton_men's_double_final", 'position': 2, 'medal_type': 'Silver', 'country': 'CHN', 'coach': 'Qiqiu Chen'}
+{
+	"name": "Weikeng Liang", 
+	"gender": "male", 
+	"date_of_birth": "datetime.date(2000, 11, 30)", 
+	"match_name": "badminton_mens_double_final", 
+	"position": 2, 
+	"medal_type": "Silver", 
+	"country": "CHN", 
+	"coach": "Qiqiu Chen"
+}
 ```
 - Returns a 400 error if name is not given.
 - Returns a 404 error if name does not exist in the athlete database.
@@ -77,7 +86,7 @@ http://34.139.156.199:8111/retrieve_athlete_info/Weikeng
 ## Running the Service
 Make sure you have Python 3 and `pip` installed on your machine and clone the repository.
 ```bash
-cd ~/part3
+cd ~/COMS-W4111-Project
 ```
 Create a virtual environment and install the dependencies.
 ```bash
