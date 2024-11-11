@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athlete Search and Add</title>
+    <style>
+        body { 
+            font-size: 15pt;
+            font-family: Arial, sans-serif;
+        }
+        .result, .form-section {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Athlete Search</h1>
+    <!-- Search Form -->
+    <form action="/retrieve_athlete_info" method="get">
+        <label for="athlete_name">Enter Athlete Name:</label>
+        <input type="text" id="athlete_name" name="name" required>
+        <button type="submit">Search</button>
+    </form>
+
+    {% if error %}
+    <div class="result">
+        <p><strong>{{ error }}</strong></p>
+    </div>
+    {% elif data %}
+    <div class="result">
+        <h2>Athlete Result</h2>
+        {% for athlete in data %}
+            <div><strong>Name:</strong> {{ athlete.name }}</div>
+            <div><strong>Gender:</strong> {{ athlete.gender }}</div>
+            <div><strong>Date of Birth:</strong> {{ athlete.date_of_birth }}</div>
+            <div><strong>Match Name:</strong> {{ athlete.match_name }}</div>
+            <div><strong>Position:</strong> {{ athlete.position }}</div>
+            <div><strong>Medal Type:</strong> {{ athlete.medal_type }}</div>
+            <div><strong>Country:</strong> {{ athlete.country }}</div>
+            <div><strong>Coach:</strong> {{ athlete.coach }}</div>
+            <button class="edit-match-button" 
+                data-athlete-pid="{{ athlete.athlete_pid }}" 
+                data-match-id="{{ athlete.match_id }}" 
+                style="font-weight: bold;">Edit Match</button>
+            <button class="delete-match-button" 
+                data-athlete-pid="{{ athlete.athlete_pid }}" 
+                data-match-id="{{ athlete.match_id }}" 
+                style="color: red; font-weight: bold;">Delete Athlete's Match Infor</button>
+            <hr>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <h1>Add Athlete</h1>
+    <!-- Add Athlete Form -->
+    <form id="add-athlete-form" class="form-section">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="Name" required><br>
+
+        <label for="gender">Gender:</label>
+        <select id="gender" name="Gender" required>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+        </select><br>
+
+        <label for="dob">Date of Birth (YYYY-MM-DD):</label>
+        <input type="date" id="dob" name="Date_of_birth" required><br>
+
+        <label for="height">Height (in meters):</label>
+        <input type="number" id="height" name="Height" step="0.01" required><br>
+
+        <label for="weight">Weight (in kg):</label>
+        <input type="number" id="weight" name="Weight" step="0.1" required><br>
+
+        <label for="country_code">Country Code:</label>
+        <select id="country_code" name="Country_code" required>
+            <option value="EST">EST</option>
+            <option value="DEN">DEN</option>
+            <option value="VIE">VIE</option>
+            <option value="BEL">BEL</option>
+            <option value="USA">USA</option>
+            <option value="JAM">JAM</option>
+            <option value="FRA">FRA</option>
+            <option value="LCA">LCA</option>
+            <option value="ESP">ESP</option>
+            <option value="THA">THA</option>
+            <option value="IDN">IDN</option>
+            <option value="CHN">CHN</option>
+            <option value="KOR">KOR</option>
+        </select><br>
+
+        <label for="country">Country:</label>
+        <select id="country" name="Country" required>
+            <option value="Estonia">Estonia</option>
+            <option value="Denmark">Denmark</option>
+            <option value="Vietnam">Vietnam</option>
+            <option value="Belgium">Belgium</option>
+            <option value="United_State_Of_America">United State Of America</option>
+            <option value="Jamaica">Jamaica</option>
+            <option value="France">France</option>
+            <option value="Saint_Lucia">Saint Lucia</option>
+            <option value="Spain">Spain</option>
+            <option value="Thailand">Thailand</option>
+            <option value="Indonesia">Indonesia</option>
+            <option value="People_Republic_of_China">People Republic of China</option>
+            <option value="South_Korea">South Korea</option>
+        </select><br>
+
+        <label for="continent">Continent:</label>
+        <select id="continent" name="Continent" required>
+            <option value="Europe">Europe</option>
+            <option value="Asia">Asia</option>
+            <option value="North_America">North America</option>
+        </select><br>
+
+        <button type="submit">Add Athlete</button>
+    </form>
+
+
+    <h1>Add Match</h1>
+    <!-- Add Match Form -->
+    <form id="add-match-form" class="form-section">
+        <label for="athlete_name_match">Athlete Name:</label>
+        <input type="text" id="athlete_name_match" name="Athlete_Name" required><br>
+    
+        <label for="match_name">Match Name:</label>
+        <input type="text" id="match_name" name="Match_name" required><br>
+    
+        <label for="match_date">Match Date (YYYY-MM-DD):</label>
+        <input type="date" id="match_date" name="Match_date" required>
+        <span id="date-error" style="color: red; display: none;">Date must be between 2024-07-26 and 2024-08-11.</span><br>
+    
+        <label for="sport_name">Sport Name:</label>
+        <select id="sport_name" name="Sport_name" required>
+            <option value="Badminton">Badminton</option>
+            <option value="Running">Running</option>
+            <option value="Swimming">Swimming</option>
+            <option value="Basketball">Basketball</option>
+            <option value="Soccer">Soccer</option>
+            <option value="Football">Football</option>
+            <option value="Shooting">Shooting</option>
+            <option value="Volleyball">Volleyball</option>
+            <option value="Cycling Track">Cycling Track</option>
+            <option value="Cycling Road">Cycling Road</option>
+        </select><br>
+    
+        <label for="category">Category:</label>
+        <select id="category" name="Category" required>
+            <option value="Ball">Ball</option>
+            <option value="Field">Field</option>
+            <option value="Swimming">Swimming</option>
+            <option value="Shooting">Shooting</option>
+            <option value="Cycling">Cycling</option>
+        </select><br>
+    
+        <label for="is_individual">Is Individual:</label>
+        <select id="is_individual" name="Is_individual" required>
+            <option value="true">True</option>
+            <option value="false">False</option>
+        </select><br>
+    
+        <label for="officials_name">Official's Name:</label>
+        <select id="officials_name" name="Officials_Name" required>
+            <option value="METSPALU Iris">METSPALU Iris</option>
+            <option value="VANHORENBEECK Bert">VANHORENBEECK Bert</option>
+            <option value="SYNDBERG Jacob">SYNDBERG Jacob</option>
+            <option value="OLSEN Henrik Boas">OLSEN Henrik Boas</option>
+            <option value="MAI Lang Yen">MAI Lang Yen</option>
+            <option value="Aria Thompson">Aria Thompson</option>
+            <option value="Liam Carter">Liam Carter</option>
+            <option value="Sophia Bennett">Sophia Bennett</option>
+            <option value="Ethan Sullivan">Ethan Sullivan</option>
+            <option value="Maya Patel">Maya Patel</option>
+        </select><br>
+    
+        <label for="position">Position:</label>
+        <input type="number" id="position" name="Position" required><br>
+    
+        <label for="medal_type">Medal Type:</label>
+        <select id="medal_type" name="Medal_type" required>
+            <option value="Gold">Gold</option>
+            <option value="Silver">Silver</option>
+            <option value="Bronze">Bronze</option>
+            <option value="None">None</option>
+        </select><br>
+    
+        <button type="submit">Add Match</button>
+    </form>
+
+    <!-- Edit Match Modal -->
+    <div id="edit-match-modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Edit Match Participation</h2>
+            <form id="edit-match-form">
+                <input type="hidden" id="edit-athlete-pid">
+                <input type="hidden" id="edit-match-id">
+
+                <label for="edit-position">Position:</label>
+                <input type="number" id="edit-position" name="Position" required><br>
+
+                <label for="edit-medal-type">Medal Type:</label>
+                <select id="edit-medal-type" name="Medal_type" required>
+                    <option value="Gold">Gold</option>
+                    <option value="Silver">Silver</option>
+                    <option value="Bronze">Bronze</option>
+                    <option value="None">None</option>
+                </select><br>
+
+                <button type="submit">Update Match</button>
+                <button type="button" id="close-edit-modal">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Styling -->
+    <style>
+        /* Modal Styles */
+        #edit-match-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            width: 50%;
+        }
+    </style>
+
+
+    {% if add_error %}
+    <div class="result">
+        <p><strong>{{ add_error }}</strong></p>
+    </div>
+    {% elif add_success %}
+    <div class="result">
+        <p><strong>{{ add_success }}</strong></p>
+    </div>
+    {% endif %}
+
+    <!-- Link to JavaScript files -->
+    <script src="{{ url_for('static', filename='formHandler.js') }}"></script>
+
+
+</body>
+</html>

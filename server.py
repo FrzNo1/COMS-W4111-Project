@@ -85,19 +85,20 @@ def teardown_request(exception):
 	except Exception as e:
 		pass
 
+@app.route('/')
+def index():
+    return render_template("index.html")
 
-@app.route('/retrieve_athlete_info/<name>', methods=['GET'])
-def retrieve_athlete_info(name):
-	"""
-	Retrieves information about a person (athlete) based on the name provided via GET request.
-	Example URL: http://localhost:8111/retrieve_athlete_info/Weikeng
-	"""
-	print(f"Searching for athlete with name: {name}")
 
-	if not name:
-		return "Error: No name provided in the request.", 400
+@app.route('/retrieve_athlete_info', methods=['GET'])
+def retrieve_athlete_info():
+    name = request.args.get('name')
+    if not name:
+        return render_template("index.html")  # Render form with no data if name is missing
 
-	query = text("""
+    print(f"Searching for athlete with name: {name}")
+    
+    query = text("""
 		WITH AthleteInfo AS (
 			SELECT P.Name, P.Gender, P.Date_of_birth, A.PID AS Athlete_PID
 			FROM Person P 
@@ -105,40 +106,43 @@ def retrieve_athlete_info(name):
 			WHERE P.Name LIKE :name
 		),
 		AthleteParticipation AS (
-			SELECT AI.Name, AI.Gender, AI.Date_of_birth, P.Match_name, P.Position, P.Medal_type, AI.Athlete_PID
+			SELECT AI.Name, AI.Gender, AI.Date_of_birth, P.Match_ID, P.Position, P.Medal_type, AI.Athlete_PID
 			FROM AthleteInfo AI JOIN Participate P ON AI.Athlete_PID = P.Athlete_PID
 		)
-		SELECT AP.Name, AP.Gender, AP.Date_of_birth, AP.Match_name, AP.Position, AP.Medal_type, C.Country_code, Co.Name AS Coach_Name
+		SELECT AP.Name, AP.Gender, AP.Date_of_birth, MS.Match_name, MS.Match_date, AP.Position, AP.Medal_type, C.Country_code, Co.Name AS Coach_Name, AP.Athlete_PID, MS.Match_ID
 		FROM AthleteParticipation AP
+		LEFT JOIN Matches_Sports MS ON AP.Match_ID = MS.Match_ID
 		LEFT JOIN Comefrom C ON AP.Athlete_PID = C.PID
 		LEFT JOIN Train T ON AP.Athlete_PID = T.Athlete_PID
 		LEFT JOIN Person Co ON T.Coach_PID = Co.PID 
 	""")
 
-	cursor = g.conn.execute(query, {'name': f"%{name}%"})
+    cursor = g.conn.execute(query, {'name': f"%{name}%"})
+    results = cursor.fetchall()
+    cursor.close()
 
-	results = cursor.fetchall()
-	if not results:
-		return f"No athlete found with the name {name}.", 404  # Not found
+    # If no results, display an error message
+    if not results:
+        return render_template("index.html", error=f"No athlete found with the name {name}."), 404
 
-	athlete_info = []
-	for result in results:
-		athlete_info.append({
+    # If results found, format the athlete information
+    athlete_info = []
+    for result in results:
+        athlete_info.append({
 			'name': result[0],           # Athlete's Name
 			'gender': result[1],         # Athlete's Gender
 			'date_of_birth': result[2],  # Athlete's Date of Birth
 			'match_name': result[3],     # Match Name
-			'position': result[4],       # Athlete's Position in the match
-			'medal_type': result[5],      # Medal Type (e.g., Gold, Silver, Bronze)
-			'country': result[6],
-			'coach': result[7]
+			'match_date': result[4],     # Match Date
+			'position': result[5],       # Athlete's Position in the match
+			'medal_type': result[6],     # Medal Type (e.g., Gold, Silver, Bronze)
+			'country': result[7],
+			'coach': result[8],
+			'athlete_pid': result[9],    # Athlete's PID
+			'match_id': result[10]       # Match ID
 		})
 
-	cursor.close()
-
-	context = dict(data=athlete_info)
-	return render_template("athlete_index.html", **context)
-
+    return render_template("index.html", data=athlete_info)
 
 @app.route('/add_athlete', methods=['POST'])
 def add_athlete():
@@ -245,15 +249,6 @@ def add_match():
 	medal_type = data['Medal_type']
 
 	query = text("""
-		SELECT Match_name 
-		FROM Matches_Sports 
-		WHERE Match_name = :name
-	""")
-	result = g.conn.execute(query, {'name': match_name}).fetchone()
-	if result:
-		return jsonify({'error': 'Match with this name already exists'}), 400
-
-	query = text("""
 		SELECT p.PID 
 		FROM Person P JOIN Athletes A ON P.PID = A.PID
 		WHERE P.Name = :name
@@ -292,42 +287,93 @@ def add_match():
 
 		print(f"DEGUG: Sports Table")
 
-		# Matches_Sports Table
 		insert_matches_sports_query = text("""
 			INSERT INTO Matches_Sports (Match_name, Match_date, Sport_name)
 			VALUES (:match_name, :match_date, :sport_name)
+			RETURNING Match_ID
 		""")
-		g.conn.execute(insert_matches_sports_query, {'match_name': match_name,'match_date': match_date, 'sport_name': sport_name})
-
+		result = g.conn.execute(insert_matches_sports_query, {'match_name': match_name, 'match_date': match_date, 'sport_name': sport_name})
+		match_id = result.fetchone()[0]
 		print(f"DEGUG: Matches_Sports Table")
 
 		# Participate Table
 		insert_participate_query = text("""
-			INSERT INTO Participate (Athlete_PID, Match_name, Position, Medal_type)
-			VALUES (:athlete_pid, :match_name, :position, :medal_type)
+			INSERT INTO Participate (Athlete_PID, Match_ID, Position, Medal_type)
+			VALUES (:athlete_pid, :match_id, :position, :medal_type)
 		""")
-		g.conn.execute(insert_participate_query, {'athlete_pid': athlete_pid, 'match_name': match_name, 'position': position, 'medal_type': medal_type})
+		g.conn.execute(insert_participate_query, {'athlete_pid': athlete_pid, 'match_id': match_id, 'position': position, 'medal_type': medal_type})
 
 		print(f"DEGUG: Participate Table")
 
 		# Oversee Table
-		insert_oversea_query = text("""
-			INSERT INTO Oversee (Official_PID, Match_name)
-			VALUES (:official_pid, :match_name)
+		insert_oversee_query = text("""
+			INSERT INTO Oversee (Official_PID, Match_ID)
+			VALUES (:official_pid, :match_id)
 		""")
-		g.conn.execute(insert_oversea_query, {'official_pid': official_pid, 'match_name': match_name})
+		g.conn.execute(insert_oversee_query, {'official_pid': official_pid, 'match_id': match_id})
 
 		print(f"DEGUG: Oversee Table")
 
 		g.conn.commit()
-		return jsonify({'message': 'Athlete added successfully', 'Match_name': match_name}), 201
+		return jsonify({'message': 'Match added successfully', 'Match_name': match_name}), 201
 
 
 	except Exception as e:
 		# Handle errors gracefully
 		return jsonify({'error': str(e)}), 500
 
-	
+@app.route('/delete_match', methods=['DELETE'])
+def delete_match():
+    data = request.get_json()
+    athlete_pid = data.get('athlete_pid')
+    match_id = data.get('match_id')
+
+    if not athlete_pid or not match_id:
+        return jsonify({'error': 'Missing athlete PID or match ID'}), 400
+
+    try:
+        # Delete from Participate table
+        query = text("""
+            DELETE FROM Participate
+            WHERE Athlete_PID = :athlete_pid AND Match_ID = :match_id
+        """)
+        g.conn.execute(query, {'athlete_pid': athlete_pid, 'match_id': match_id})
+        g.conn.commit()
+        return jsonify({'message': 'Match participation deleted successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/update_match', methods=['PUT'])
+def update_match():
+    data = request.get_json()
+    athlete_pid = data.get('athlete_pid')
+    match_id = data.get('match_id')
+    position = data.get('position')
+    medal_type = data.get('medal_type')
+
+    if not all([athlete_pid, match_id, position, medal_type]):
+        return jsonify({'error': 'Missing required fields'}), 400
+
+    try:
+        # Update the Participate table
+        query = text("""
+            UPDATE Participate
+            SET Position = :position, Medal_type = :medal_type
+            WHERE Athlete_PID = :athlete_pid AND Match_ID = :match_id
+        """)
+        g.conn.execute(query, {
+            'position': position,
+            'medal_type': medal_type,
+            'athlete_pid': athlete_pid,
+            'match_id': match_id
+        })
+        g.conn.commit()
+        return jsonify({'message': 'Match participation updated successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 if __name__ == "__main__":
 	import click
 
