@@ -63,6 +63,9 @@ http://34.139.156.199:8111/retrieve_athlete_info/Weikeng
 	"Sport_name": "TEST",
 	"Category": "TEST",
 	"Is_individual": true,
+    "Venue_name": "TEST",
+    "Address": "TEST",
+    "Capacity": "100",
 	"Officials_Name": "METSPALU Iris",
 	"Position": "1",
 	"Medal_type": "Silver"
@@ -72,7 +75,7 @@ http://34.139.156.199:8111/retrieve_athlete_info/Weikeng
 ```json
 {
     "Match_name": "TEST",
-    "message": "Athlete added successfully"
+    "message": "Match added successfully"
 }
 ```
 - Returns a 400 error if one of the information related to the match is not given.
