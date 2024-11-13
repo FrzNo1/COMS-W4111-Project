@@ -35,18 +35,20 @@
             <div><strong>Gender:</strong> {{ athlete.gender }}</div>
             <div><strong>Date of Birth:</strong> {{ athlete.date_of_birth }}</div>
             <div><strong>Match Name:</strong> {{ athlete.match_name }}</div>
+            <div><strong>Match Date:</strong> {{ athlete.match_date }}</div>
             <div><strong>Position:</strong> {{ athlete.position }}</div>
             <div><strong>Medal Type:</strong> {{ athlete.medal_type }}</div>
+            <div><strong>Venue Name:</strong> {{ athlete.venue_name }}</div> <!-- New Venue Name Field -->
             <div><strong>Country:</strong> {{ athlete.country }}</div>
             <div><strong>Coach:</strong> {{ athlete.coach }}</div>
             <button class="edit-match-button" 
-                data-athlete-pid="{{ athlete.athlete_pid }}" 
-                data-match-id="{{ athlete.match_id }}" 
-                style="font-weight: bold;">Edit Match</button>
+                    data-athlete-pid="{{ athlete.athlete_pid }}" 
+                    data-match-id="{{ athlete.match_id }}" 
+                    style="font-weight: bold;">Edit Match</button>
             <button class="delete-match-button" 
-                data-athlete-pid="{{ athlete.athlete_pid }}" 
-                data-match-id="{{ athlete.match_id }}" 
-                style="color: red; font-weight: bold;">Delete Athlete's Match Infor</button>
+                    data-athlete-pid="{{ athlete.athlete_pid }}" 
+                    data-match-id="{{ athlete.match_id }}" 
+                    style="color: red; font-weight: bold;">Delete Athlete's Match Info</button>
             <hr>
         {% endfor %}
     </div>
@@ -185,6 +187,36 @@
             <option value="Bronze">Bronze</option>
             <option value="None">None</option>
         </select><br>
+
+        <label for="venue_name">Venue Name:</label>
+        <select id="venue_name" name="Venue_name" required>
+            <option value="porte de la chapelle arena">porte de la chapelle arena</option>
+            <option value="Stade de France">Stade de France</option>
+            <option value="paris la defense arena">paris la defense arena</option>
+            <option value="Bercy Arena">Bercy Arena</option>
+            <option value="Bordeaux Stadium">Bordeaux Stadium</option>
+            <option value="South Paris Arena">South Paris Arena</option>
+            <option value="Eiffel Tower Stadium">Eiffel Tower Stadium</option>
+            <option value="Geoffroy-Guichard Stadium">Geoffroy-Guichard Stadium</option>
+            <option value="Invalides">Invalides</option>
+        </select><br>
+
+        <label for="venue_address">Venue Address:</label>
+        <select id="venue_address" name="Address" required>
+            <option value="56 Bd Ney, 75018 Paris, France">56 Bd Ney, 75018 Paris, France</option>
+            <option value="93200 Saint-Denis, France">93200 Saint-Denis, France</option>
+            <option value="99 Jard. de l'Arche, 92000 Nanterre, France">99 Jard. de l'Arche, 92000 Nanterre, France</option>
+            <option value="8 Bd de Bercy, 75012 Paris, France">8 Bd de Bercy, 75012 Paris, France</option>
+            <option value="Cr Jules Ladoumegue, 33300 Bordeaux, France">Cr Jules Ladoumegue, 33300 Bordeaux, France</option>
+            <option value="1 Pl. de la Prte de Versailles, 75015 Paris, France">1 Pl. de la Prte de Versailles, 75015 Paris, France</option>
+            <option value="2 All. Adrienne Lecouvreur, 75007 Paris, France">2 All. Adrienne Lecouvreur, 75007 Paris, France</option>
+            <option value="14 Rue Paul et Pierre Guichard, 42000 Saint-Étienne, France">14 Rue Paul et Pierre Guichard, 42000 Saint-Étienne, France</option>
+            <option value="75007 Paris, France">75007 Paris, France</option>
+        </select><br>
+
+        <label for="venue_capacity">Venue Capacity:</label>
+        <input type="number" id="venue_capacity" name="Capacity" required><br>
+
     
         <button type="submit">Add Match</button>
     </form>
@@ -196,6 +228,10 @@
             <form id="edit-match-form">
                 <input type="hidden" id="edit-athlete-pid">
                 <input type="hidden" id="edit-match-id">
+
+                <label for="edit-match-date">Match Date:</label>
+                <input type="date" id="edit-match-date" name="Match_date" required>
+                <span id="edit-date-error" style="color: red; display: none;">Date must be between 2024-07-26 and 2024-08-11.</span><br>
 
                 <label for="edit-position">Position:</label>
                 <input type="number" id="edit-position" name="Position" required><br>

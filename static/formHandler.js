@@ -63,7 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
             Is_individual: document.getElementById('is_individual').value === 'true',
             Officials_Name: document.getElementById('officials_name').value,
             Position: document.getElementById('position').value,
-            Medal_type: document.getElementById('medal_type').value
+            Medal_type: document.getElementById('medal_type').value,
+            Venue_name: document.getElementById('venue_name').value,
+            Address: document.getElementById('venue_address').value,
+            Capacity: document.getElementById('venue_capacity').value
         };
 
         try {
@@ -123,37 +126,54 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Handle Edit Match Button Click
     document.querySelectorAll('.edit-match-button').forEach(button => {
         button.addEventListener('click', (event) => {
             const athlete_pid = event.target.getAttribute('data-athlete-pid');
             const match_id = event.target.getAttribute('data-match-id');
+            const match_date = event.target.getAttribute('data-match-date'); // New Match Date
             const position = event.target.getAttribute('data-position');
             const medal_type = event.target.getAttribute('data-medal-type');
-
+    
             // Populate the form with existing data
             document.getElementById('edit-athlete-pid').value = athlete_pid;
             document.getElementById('edit-match-id').value = match_id;
+            document.getElementById('edit-match-date').value = match_date; // Set Match Date
             document.getElementById('edit-position').value = position;
             document.getElementById('edit-medal-type').value = medal_type;
-
+    
             // Display the modal
             document.getElementById('edit-match-modal').style.display = 'block';
         });
     });
-
+    
     // Handle Edit Match Form Submission
     document.getElementById('edit-match-form').addEventListener('submit', async (event) => {
         event.preventDefault();
 
+        const matchDateInput = document.getElementById('edit-match-date');
+        const dateError = document.getElementById('edit-date-error'); // Add a span for displaying errors
+        const matchDate = new Date(matchDateInput.value);
+        const minDate = new Date('2024-07-26');
+        const maxDate = new Date('2024-08-11');
+
+        // Validate match date
+        if (matchDate < minDate || matchDate > maxDate) {
+            dateError.style.display = 'inline'; // Show error message
+            return;
+        } else {
+            dateError.style.display = 'none'; // Hide error message if valid
+        }
+
         const athlete_pid = document.getElementById('edit-athlete-pid').value;
         const match_id = document.getElementById('edit-match-id').value;
+        const match_date = matchDateInput.value; // Validated Match Date
         const position = document.getElementById('edit-position').value;
         const medal_type = document.getElementById('edit-medal-type').value;
 
         const updateData = {
             athlete_pid: athlete_pid,
             match_id: match_id,
+            match_date: match_date,
             position: position,
             medal_type: medal_type
         };
@@ -164,6 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updateData)
             });
+
             const result = await response.json();
             if (response.ok) {
                 alert(result.message);
@@ -176,7 +197,6 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('An unexpected error occurred. Please try again.');
         }
     });
-
 
     // Handle Closing the Modal
     document.getElementById('close-edit-modal').addEventListener('click', () => {

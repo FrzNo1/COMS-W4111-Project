@@ -4,19 +4,22 @@
 - Retrieves the athlete and all his/her related information for the given name.
 - Example Request:
 ```bash
-http://34.139.156.199:8111/retrieve_athlete_info/Weikeng
+http://<public-ip>:8111/retrieve_athlete_info/Weikeng
 ```
 - Example Response:
 ```json
 {
-	"name": "Weikeng Liang", 
-	"gender": "male", 
-	"date_of_birth": "datetime.date(2000, 11, 30)", 
-	"match_name": "badminton_mens_double_final", 
-	"position": 2, 
-	"medal_type": "Silver", 
-	"country": "CHN", 
-	"coach": "Qiqiu Chen"
+    "name": "Weikeng Liang",
+    "gender": "male",
+    "date_of_birth": "datetime.date(2000, 11, 30)",
+    "match_name": "badminton_mens_double_final",
+    "position": 2,
+    "medal_type": "Silver",
+    "country": "CHN",
+    "coach": "Qiqiu Chen",
+    "athlete_pid": 43,
+    "match_id": 12,
+    "venue_name": "porte de la chapelle arena"
 }
 ```
 - Returns a 400 error if name is not given.
@@ -84,6 +87,53 @@ http://34.139.156.199:8111/retrieve_athlete_info/Weikeng
 - Returns a 400 error if there is no matching official in the database
 - Returns a 201 on success.
 
+### DELETE `/delete_match`
+- Deletes a match participation entry for a given athlete and match ID.
+
+- Example Request:
+```json
+{
+    "athlete_pid": 43,
+    "match_id": 12
+}
+```
+- Example Response:
+```json
+{
+    "message": "Match participation deleted successfully"
+}
+```
+- Returns a 400 error if athlete PID or match ID is not provided.
+
+- Returns a 404 error if no matching entry is found.
+
+- Returns a 200 on success.
+
+### PUT `/update_match`
+
+- Updates match details, including match date, position, and medal type for a given athlete and match.
+
+- Example Request:
+```json
+{
+    "athlete_pid": 43,
+    "match_id": 12,
+    "match_date": "2024-08-06",
+    "position": "2",
+    "medal_type": "Bronze"
+}
+```
+- Example Response:
+```json
+{
+    "message": "Match updated successfully"
+}
+```
+- Returns a 400 error if any required information is missing.
+
+- Returns a 404 error if no matching entry is found.
+
+- Returns a 200 on success.
 
 
 ## Running the Service

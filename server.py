@@ -109,9 +109,12 @@ def retrieve_athlete_info():
 			SELECT AI.Name, AI.Gender, AI.Date_of_birth, P.Match_ID, P.Position, P.Medal_type, AI.Athlete_PID
 			FROM AthleteInfo AI JOIN Participate P ON AI.Athlete_PID = P.Athlete_PID
 		)
-		SELECT AP.Name, AP.Gender, AP.Date_of_birth, MS.Match_name, MS.Match_date, AP.Position, AP.Medal_type, C.Country_code, Co.Name AS Coach_Name, AP.Athlete_PID, MS.Match_ID
+		SELECT AP.Name, AP.Gender, AP.Date_of_birth, MS.Match_name, MS.Match_date, AP.Position, AP.Medal_type, 
+			C.Country_code, Co.Name AS Coach_Name, AP.Athlete_PID, MS.Match_ID, V.Venue_name
 		FROM AthleteParticipation AP
 		LEFT JOIN Matches_Sports MS ON AP.Match_ID = MS.Match_ID
+		LEFT JOIN Hold H ON MS.Match_ID = H.Match_ID
+		LEFT JOIN Venues V ON H.Venue_name = V.Venue_name
 		LEFT JOIN Comefrom C ON AP.Athlete_PID = C.PID
 		LEFT JOIN Train T ON AP.Athlete_PID = T.Athlete_PID
 		LEFT JOIN Person Co ON T.Coach_PID = Co.PID 
@@ -136,10 +139,11 @@ def retrieve_athlete_info():
 			'match_date': result[4],     # Match Date
 			'position': result[5],       # Athlete's Position in the match
 			'medal_type': result[6],     # Medal Type (e.g., Gold, Silver, Bronze)
-			'country': result[7],
-			'coach': result[8],
+			'country': result[7],        # Country
+			'coach': result[8],          # Coach's Name
 			'athlete_pid': result[9],    # Athlete's PID
-			'match_id': result[10]       # Match ID
+			'match_id': result[10],      # Match ID
+			'venue_name': result[11]     # Venue Name
 		})
 
     return render_template("index.html", data=athlete_info)
@@ -373,30 +377,41 @@ def update_match():
     data = request.get_json()
     athlete_pid = data.get('athlete_pid')
     match_id = data.get('match_id')
+    match_date = data.get('match_date')
     position = data.get('position')
     medal_type = data.get('medal_type')
 
-    if not all([athlete_pid, match_id, position, medal_type]):
+    if not all([athlete_pid, match_id, match_date, position, medal_type]):
         return jsonify({'error': 'Missing required fields'}), 400
 
     try:
-        # Update the Participate table
-        query = text("""
+        # Update the Participate and Matches_Sports tables
+        update_participate_query = text("""
             UPDATE Participate
             SET Position = :position, Medal_type = :medal_type
             WHERE Athlete_PID = :athlete_pid AND Match_ID = :match_id
         """)
-        g.conn.execute(query, {
+        g.conn.execute(update_participate_query, {
             'position': position,
             'medal_type': medal_type,
             'athlete_pid': athlete_pid,
             'match_id': match_id
         })
+
+        update_match_date_query = text("""
+            UPDATE Matches_Sports
+            SET Match_date = :match_date
+            WHERE Match_ID = :match_id
+        """)
+        g.conn.execute(update_match_date_query, {
+            'match_date': match_date,
+            'match_id': match_id
+        })
+
         g.conn.commit()
-        return jsonify({'message': 'Match participation updated successfully'}), 200
+        return jsonify({'message': 'Match updated successfully'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 if __name__ == "__main__":
 	import click
