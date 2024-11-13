@@ -235,7 +235,7 @@ def add_athlete():
 def add_match():
 	data = request.get_json()
 
-	if not all(key in data for key in ['Athlete_Name', 'Match_name', 'Match_date', 'Sport_name', 'Category', 'Is_individual', 'Officials_Name', 'Position', 'Medal_type']):
+	if not all(key in data for key in ['Athlete_Name', 'Match_name', 'Match_date', 'Sport_name', 'Category', 'Is_individual', 'Officials_Name', 'Venue_name', 'Address', 'Capacity', 'Position', 'Medal_type']):
 		return jsonify({'error': 'Missing required fields, please see documentation'}), 400
 
 	match_name = data['Match_name']
@@ -245,6 +245,9 @@ def add_match():
 	match_date = data['Match_date']
 	category = data['Category']
 	is_individual = data['Is_individual']
+	venue_name = data['Venue_name']
+	address = data['Address']
+	capacity = data['Capacity']
 	position = data['Position']
 	medal_type = data['Medal_type']
 
@@ -313,6 +316,27 @@ def add_match():
 		g.conn.execute(insert_oversee_query, {'official_pid': official_pid, 'match_id': match_id})
 
 		print(f"DEGUG: Oversee Table")
+
+		# Venues Table
+		query = text("""
+			SELECT Venue_name
+			FROM Venues
+			WHERE Venue_name = :name
+		""")
+		result = g.conn.execute(query, {'name': venue_name}).fetchone()
+		if not result:
+			query = text("""
+				INSERT INTO Venues (Venue_name, Address, Capacity)
+				VALUES (:venue_name, :address, :capacity)
+			""")
+			g.conn.execute(query, {'venue_name': venue_name, 'address': address, 'capacity': capacity})
+
+		query = text("""
+			INSERT INTO Hold (Match_id, Venue_name)
+			VALUES (:match_id, :venue_name)
+		""")
+		result = g.conn.execute(query, {'match_id': match_id, 'venue_name': venue_name})
+		print(f"DEGUG: Venues Table")
 
 		g.conn.commit()
 		return jsonify({'message': 'Match added successfully', 'Match_name': match_name}), 201
