@@ -1,10 +1,18 @@
 ## Endpoints
 
-### GET `/retrieve_athlete_info/<athlete_name>`
+### Database 
+- The PostgreSQL account name: rf2715
+
+### URL of web application
+```bash
+http://34.73.166.195:8111
+```
+
+### GET `/retrieve_athlete_info`
 - Retrieves the athlete and all his/her related information for the given name.
 - Example Request:
 ```bash
-http://<public-ip>:8111/retrieve_athlete_info/Weikeng
+http://34.73.166.195:8111/retrieve_atretrieve_athlete_info?name=Weikeng
 ```
 - Example Response:
 ```json
@@ -129,6 +137,17 @@ http://<public-ip>:8111/retrieve_athlete_info/Weikeng
 - Returns a 404 error if no matching entry is found.
 - Returns a 200 on success.
 
+### Interesting database operations 
+
+- Athlete Search page
+    - This page allows users to search for athletes by name and view detailed information about them, including personal details, match participations, positions, medals won, associated coaches, and venues.
+    - The application executes a complex SQL query that joins multiple tables—Person, Athletes, Participate, Matches_Sports, Hold, Venues, Comefrom, and Train—to gather comprehensive information about the athlete.
+    - This page demonstrates the power of relational databases in aggregating and presenting interconnected data from multiple tables. 
+
+- Add Match Participation Page
+    - This page enables users to add new match participation records for athletes, including details about the match, sport, officials, venue, and the athlete's performance.
+    - The application checks for the existence of records in related tables (Sports, Venues) and inserts new records if they don't already exist.
+    - This page highlights the complexity of maintaining data integrity and consistency across multiple related tables. 
 
 ## Running the Service
 Make sure you have Python 3 and `pip` installed on your machine and clone the repository.
@@ -146,3 +165,4 @@ Run the application from the root directory.
 python3 server.py
 ```
 The application will be running on `http://localhost:8111/`.
+

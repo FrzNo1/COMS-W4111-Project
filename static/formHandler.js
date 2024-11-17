@@ -130,18 +130,16 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', (event) => {
             const athlete_pid = event.target.getAttribute('data-athlete-pid');
             const match_id = event.target.getAttribute('data-match-id');
-            const match_date = event.target.getAttribute('data-match-date'); // New Match Date
+            const match_date = event.target.getAttribute('data-match-date');
             const position = event.target.getAttribute('data-position');
             const medal_type = event.target.getAttribute('data-medal-type');
     
             // Populate the form with existing data
             document.getElementById('edit-athlete-pid').value = athlete_pid;
             document.getElementById('edit-match-id').value = match_id;
-            document.getElementById('edit-match-date').value = match_date; // Set Match Date
+            document.getElementById('edit-match-date').value = match_date; 
             document.getElementById('edit-position').value = position;
             document.getElementById('edit-medal-type').value = medal_type;
-    
-            // Display the modal
             document.getElementById('edit-match-modal').style.display = 'block';
         });
     });
@@ -151,17 +149,17 @@ document.addEventListener('DOMContentLoaded', () => {
         event.preventDefault();
 
         const matchDateInput = document.getElementById('edit-match-date');
-        const dateError = document.getElementById('edit-date-error'); // Add a span for displaying errors
+        const dateError = document.getElementById('edit-date-error'); 
         const matchDate = new Date(matchDateInput.value);
         const minDate = new Date('2024-07-26');
         const maxDate = new Date('2024-08-11');
 
         // Validate match date
         if (matchDate < minDate || matchDate > maxDate) {
-            dateError.style.display = 'inline'; // Show error message
+            dateError.style.display = 'inline'; 
             return;
         } else {
-            dateError.style.display = 'none'; // Hide error message if valid
+            dateError.style.display = 'none'; 
         }
 
         const athlete_pid = document.getElementById('edit-athlete-pid').value;
