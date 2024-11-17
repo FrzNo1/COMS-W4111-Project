@@ -1,1 +1,29 @@
 source venv/bin/activate
+
+
+Add Athlete
+
+"Name": "TEST",
+"Gender": "Female",
+"Date_of_birth": "1995-06-15",
+"Height": 1.70,
+"Weight": 65.5,
+"Country_code": "TTT",
+"Country": "Test",
+"Continent": "North America"
+
+
+Add Match
+
+"Athlete_Name": "TEST",
+"Match_name": "TEST",
+"Match_date": "2024-08-05",
+"Sport_name": "TEST",
+"Category": "TEST",
+"Is_individual": true,
+"Venue_name": "TEST",
+"Address": "TEST",
+"Capacity": "100",
+"Officials_Name": "METSPALU Iris",
+"Position": "1",
+"Medal_type": "Silver"

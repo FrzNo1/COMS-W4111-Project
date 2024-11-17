@@ -89,7 +89,6 @@ http://<public-ip>:8111/retrieve_athlete_info/Weikeng
 
 ### DELETE `/delete_match`
 - Deletes a match participation entry for a given athlete and match ID.
-
 - Example Request:
 ```json
 {
@@ -104,15 +103,12 @@ http://<public-ip>:8111/retrieve_athlete_info/Weikeng
 }
 ```
 - Returns a 400 error if athlete PID or match ID is not provided.
-
 - Returns a 404 error if no matching entry is found.
-
 - Returns a 200 on success.
 
 ### PUT `/update_match`
 
 - Updates match details, including match date, position, and medal type for a given athlete and match.
-
 - Example Request:
 ```json
 {
@@ -130,9 +126,7 @@ http://<public-ip>:8111/retrieve_athlete_info/Weikeng
 }
 ```
 - Returns a 400 error if any required information is missing.
-
 - Returns a 404 error if no matching entry is found.
-
 - Returns a 200 on success.
 
 
