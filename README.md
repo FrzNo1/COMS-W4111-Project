@@ -137,6 +137,14 @@ http://34.73.166.195:8111/retrieve_atretrieve_athlete_info?name=Weikeng
 - Returns a 404 error if no matching entry is found.
 - Returns a 200 on success.
 
+### Implementation from Part 1
+
+We implement the functionality we described from part 1
+- Create: Users can simply add new athletes and add new matches. The backend will handle all the logics to update all the tables.
+- Read: User can search for an athlete. All athletes and related matches' information will be displayed accordingly.
+- Update: User can update the athlete and match information. They can change the date and athletes' ranks for the match.
+- Delete: User is able to delete the athlete or match information.
+
 ### Interesting database operations 
 
 - Athlete Search page
