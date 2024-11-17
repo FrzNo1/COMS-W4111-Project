@@ -149,6 +149,9 @@ http://34.73.166.195:8111/retrieve_atretrieve_athlete_info?name=Weikeng
     - The application checks for the existence of records in related tables (Sports, Venues) and inserts new records if they don't already exist.
     - This page highlights the complexity of maintaining data integrity and consistency across multiple related tables. 
 
+### AI Using
+- Use ChatGPT to generates frontend drop-down boxes for any input elements.
+
 ## Running the Service
 Make sure you have Python 3 and `pip` installed on your machine and clone the repository.
 ```bash
